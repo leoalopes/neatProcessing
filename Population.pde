@@ -26,9 +26,12 @@ class Population{
     this.lastOutput = lastOutput;
   }
   
-  void sortSpecies(){
-    
+  Population(){
   }
+  
+  //void sortSpecies(){
+    
+  //}
   
   void naturalSelection(){
     //create first population on pop constructor
@@ -55,102 +58,130 @@ class Population{
     
     while(newGens.size() < size){
       //select specie
-      Specie s = selectSpecie();
+      //Specie s = selectSpecie();
       
       //select parents
-      Genome parent1 = selectParent(s);
-      Genome parent2 = selectParent(s);
+      //Genome parent1 = selectParent(s);
+      //Genome parent2 = selectParent(s);
       
       //create new
-      Genome child = crossover(parent1, parent2);
+      //Genome child = crossover(parent1, parent2);
       
       //mutate ps: on mutation check if innovation number has to be incremented
-      mutate(child);
+      //mutate(child);
       
       //add to next gen
-      newGens.add(child);
+      //newGens.add(child);
     }
     
     gens = newGens;
     newGens = new ArrayList();
     
     //sort new generation species
-    sortSpecies();
+    //sortSpecies();
     generation++;
   }
   
-  Specie selectSpecie(){
+  //Specie selectSpecie(){
     
-  }
+  //}
   
-  Genome selectParent(Specie s){
+  //Genome selectParent(Specie s){
   
-  }
+  //}
   
   Genome crossover(Genome p1, Genome p2){
-    int maxInnP1 = 0;
-    int maxInnP2 = 0;
-    Genome child = new Genome();
-    for(ConnectionGene con : p1.connections){
-      if(con.innovation > maxInnP1)
-        maxInnP1 = con.innovation;
+    ArrayList<ConnectionGene> newConnections = new ArrayList();
+    ArrayList<NodeGene> newNodes = new ArrayList();
+    
+    //passar matching genes
+    for(ConnectionGene con1 : p1.connections){
+      for(ConnectionGene con2 : p2.connections){
+        if(con1.innovation == con2.innovation){
+          if(random(0, 1) <= 0.5){
+            newConnections.add(con1.cpy());
+          } else {
+            newConnections.add(con2.cpy());
+          }
+        }
+      }
     }
-    for(ConnectionGene con : p2.connections){
-      if(con.innovation > maxInnP2)
-        maxInnP2 = con.innovation;
-    }
-    if(maxInnP1 >= maxInnP2){
+    
+    //passar excesso, disjoint e nodes do maior fitness
+    if(p1.fitness > p2.fitness){
       for(ConnectionGene con1 : p1.connections){
         boolean found = false;
-        for(ConnectionGene con2 : p2.connections){
+        for(ConnectionGene con2 : newConnections){
           if(con1.innovation == con2.innovation){
             found = true;
-            if(random(1)<=0.5){
-              child.connections.add(con1.cpy());
-            } else {
-              child.connections.add(con2.cpy());
-            }
           }
         }
         if(!found){
-          if(p1.fitness >= p2.fitness){
-            child.connections.add(con1.cpy());
-          }
+          newConnections.add(con1.cpy());
         }
       }
-    } else {
-      for(ConnectionGene con2 : p2.connections){
-        boolean found = false;
-        for(ConnectionGene con1 : p1.connections){
-          if(con1.innovation == con2.innovation){
-            found = true;
-            if(random(1)<=0.5){
-              child.connections.add(con1.cpy());
-            } else {
-              child.connections.add(con2.cpy());
-            }
-          }
-        }
-        if(!found){
-          if(p2.fitness >= p1.fitness){
-            child.connections.add(con2.cpy());
-          }
-        }
-      }
-    }
-    ArrayList<NodeGene> newNodes = new ArrayList();
-    if(p1.fitness >= p2.fitness){
+      
       for(NodeGene ng : p1.nodes){
         newNodes.add(ng.cpy());
       }
-    } else {
+      
+      return new Genome(newConnections, newNodes);
+    } else if(p2.fitness > p1.fitness){
+      for(ConnectionGene con1 : p2.connections){
+        boolean found = false;
+        for(ConnectionGene con2 : newConnections){
+          if(con1.innovation == con2.innovation){
+            found = true;
+          }
+        }
+        if(!found){
+          newConnections.add(con1.cpy());
+        }
+      }
+      
       for(NodeGene ng : p2.nodes){
         newNodes.add(ng.cpy());
       }
+      
+      return new Genome(newConnections, newNodes);
+    } else {
+      //caso igual passar excesso, disjoint dos dois e node do maior
+      for(ConnectionGene con1 : p1.connections){
+        boolean found = false;
+        for(ConnectionGene con2 : newConnections){
+          if(con1.innovation == con2.innovation){
+            found = true;
+          }
+        }
+        if(!found){
+          newConnections.add(con1.cpy());
+        }
+      }
+      
+      for(ConnectionGene con1 : p2.connections){
+        boolean found = false;
+        for(ConnectionGene con2 : newConnections){
+          if(con1.innovation == con2.innovation){
+            found = true;
+          }
+        }
+        if(!found){
+          newConnections.add(con1.cpy());
+        }
+      }
+      
+      if(p1.nodes.size() > p2.nodes.size()){
+        for(NodeGene ng : p1.nodes){
+          newNodes.add(ng.cpy());
+        }
+      } else {
+        for(NodeGene ng : p2.nodes){
+          newNodes.add(ng.cpy());
+        }
+      }    
     }
-    child.nodes = newNodes;
     
-    return child;
+    return new Genome(newConnections, newNodes);
   }
   
   void mutate(Genome child){

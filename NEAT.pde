@@ -2,53 +2,66 @@ import java.util.Map;
 
 Population pop;
 PFont f;
+Genome gen;
 int index = 0;
 
 void setup(){
-  ArrayList<NodeGene> nodes = new ArrayList();
-  ArrayList<ConnectionGene> connections = new ArrayList();
+  ArrayList<NodeGene> nodes1 = new ArrayList();
+  ArrayList<ConnectionGene> connections1 = new ArrayList();
+  ArrayList<NodeGene> nodes2 = new ArrayList();
+  ArrayList<ConnectionGene> connections2 = new ArrayList();
   
-  //nodes.add(new NodeGene(1, 1));
-  //nodes.add(new NodeGene(1, 2));
-  //nodes.add(new NodeGene(1, 3));
-  //nodes.add(new NodeGene(3, 4));
-  //nodes.add(new NodeGene(3, 5));
-  //nodes.add(new NodeGene(2, 6));
+  nodes1.add(new NodeGene(1, 1));
+  nodes1.add(new NodeGene(1, 2));
+  nodes1.add(new NodeGene(1, 3));
+  nodes1.add(new NodeGene(3, 4));
+  nodes1.add(new NodeGene(2, 5));
 
-  //connections.add(new ConnectionGene(1, 4, 0.5f, true, InnovationGenerator.getInnovation()));
-  //connections.add(new ConnectionGene(2, 4, -0.5f, true, InnovationGenerator.getInnovation()));
-  //connections.add(new ConnectionGene(3, 4, 0.5f, true, InnovationGenerator.getInnovation()));
-  //connections.add(new ConnectionGene(1, 5, -0.5f, true, InnovationGenerator.getInnovation()));
-  //connections.add(new ConnectionGene(2, 5, 0.5f, false, InnovationGenerator.getInnovation()));
-  //connections.add(new ConnectionGene(3, 5, 0.5f, true, InnovationGenerator.getInnovation()));
-  //connections.add(new ConnectionGene(2, 6, 0.5f, true, InnovationGenerator.getInnovation()));
-  //connections.add(new ConnectionGene(6, 5, 0.5f, true, InnovationGenerator.getInnovation()));
+  connections1.add(new ConnectionGene(1, 4, 0.5f, true, 1));
+  connections1.add(new ConnectionGene(2, 4, -0.5f, false, 2));
+  connections1.add(new ConnectionGene(3, 4, 0.5f, true, 3));
+  connections1.add(new ConnectionGene(2, 5, -0.5f, true, 4));
+  connections1.add(new ConnectionGene(5, 4, 0.5f, true, 5));
+  connections1.add(new ConnectionGene(1, 5, 0.5f, true, 8));
+  
+  Genome gen1 = new Genome(connections1, nodes1);
 
-  nodes.add(new NodeGene(1, 1));
-  nodes.add(new NodeGene(1, 2));
-  nodes.add(new NodeGene(1, 3));
-  nodes.add(new NodeGene(1, 4));
-  nodes.add(new NodeGene(3, 5));
+  nodes2.add(new NodeGene(1, 1));
+  nodes2.add(new NodeGene(1, 2));
+  nodes2.add(new NodeGene(1, 3));
+  nodes2.add(new NodeGene(3, 4));
+  nodes2.add(new NodeGene(2, 5));
+  nodes2.add(new NodeGene(2, 6));
   
-  connections.add(new ConnectionGene(4, 5, 0.5f, true, InnovationGenerator.getInnovation()));
+  connections2.add(new ConnectionGene(1, 4, 0.5f, true, 1));
+  connections2.add(new ConnectionGene(2, 4, -0.5f, false, 2));
+  connections2.add(new ConnectionGene(3, 4, 0.5f, true, 3));
+  connections2.add(new ConnectionGene(2, 5, -0.5f, true, 4));
+  connections2.add(new ConnectionGene(5, 4, 0.5f, false, 5));
+  connections2.add(new ConnectionGene(5, 6, 0.5f, true, 6));
+  connections2.add(new ConnectionGene(6, 4, 0.5f, true, 7));
+  connections2.add(new ConnectionGene(3, 5, 0.5f, true, 9));
+  connections2.add(new ConnectionGene(1, 6, 0.5f, true, 10));
   
-  Genome gen = new Genome(connections, nodes);
+  Genome gen2 = new Genome(connections2, nodes2);
+  gen2.fitness = 2f;
   
-  pop = new Population(100, gen, 4, 5);
+  pop = new Population();
+  
+  gen = pop.crossover(gen1, gen2);
   
   size(1000, 600);
   f = createFont("Arial", 14, true);
 }
 
 void draw(){
-  Genome gen = pop.gens.get(index);
   background(255);
   Map<Integer, Integer> inputs = new HashMap();
   Map<Integer, Integer> hiddens = new HashMap();
   Map<Integer, Integer> outputs = new HashMap();
   int ins = 1;
   int outs = 1;
-  int hids = 1;
+  int hids = 3;
   stroke(0);
   for(NodeGene node : gen.nodes){
     if(node.type == 1){
@@ -118,13 +131,13 @@ void draw(){
       rect(xOut-20, yOut-5, 10, 10);
     }
   }
-  delay(1000);
-  if(index<99)
-    index++;
-  else{
-    for(ConnectionGene con : Mutations.getInnovations()){
-      println(con.innovation + " - " + con.inNode + " " + con.outNode);
-    }
-    stop();
-  }
+  //delay(1000);
+  //if(index<99)
+  //  index++;
+  //else{
+  //  for(ConnectionGene con : Mutations.getInnovations()){
+  //    println(con.innovation + " - " + con.inNode + " " + con.outNode);
+  //  }
+  //  stop();
+  //}
 }
