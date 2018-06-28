@@ -11,44 +11,56 @@ void setup(){
   ArrayList<NodeGene> nodes2 = new ArrayList();
   ArrayList<ConnectionGene> connections2 = new ArrayList();
   
+  //nodes1.add(new NodeGene(1, 1));
+  //nodes1.add(new NodeGene(1, 2));
+  //nodes1.add(new NodeGene(1, 3));
+  //nodes1.add(new NodeGene(3, 4));
+  //nodes1.add(new NodeGene(2, 5));
+
+  //connections1.add(new ConnectionGene(1, 4, 0.5f, true, 1));
+  //connections1.add(new ConnectionGene(2, 4, -0.5f, false, 2));
+  //connections1.add(new ConnectionGene(3, 4, 0.5f, true, 3));
+  //connections1.add(new ConnectionGene(2, 5, -0.5f, true, 4));
+  //connections1.add(new ConnectionGene(5, 4, 0.5f, true, 5));
+  //connections1.add(new ConnectionGene(1, 5, 0.5f, true, 8));
+  
+  //Genome gen1 = new Genome(connections1, nodes1);
+
+  //nodes2.add(new NodeGene(1, 1));
+  //nodes2.add(new NodeGene(1, 2));
+  //nodes2.add(new NodeGene(1, 3));
+  //nodes2.add(new NodeGene(3, 4));
+  //nodes2.add(new NodeGene(2, 5));
+  //nodes2.add(new NodeGene(2, 6));
+  
+  //connections2.add(new ConnectionGene(1, 4, 0.5f, true, 1));
+  //connections2.add(new ConnectionGene(2, 4, -0.5f, false, 2));
+  //connections2.add(new ConnectionGene(3, 4, 0.5f, true, 3));
+  //connections2.add(new ConnectionGene(2, 5, -0.5f, true, 4));
+  //connections2.add(new ConnectionGene(5, 4, 0.5f, false, 5));
+  //connections2.add(new ConnectionGene(5, 6, 0.5f, true, 6));
+  //connections2.add(new ConnectionGene(6, 4, 0.5f, true, 7));
+  //connections2.add(new ConnectionGene(3, 5, 0.5f, true, 9));
+  //connections2.add(new ConnectionGene(1, 6, 0.5f, true, 10));
+  
+  //Genome gen2 = new Genome(connections2, nodes2);
+  //gen2.fitness = 2f;
+  
   nodes1.add(new NodeGene(1, 1));
   nodes1.add(new NodeGene(1, 2));
   nodes1.add(new NodeGene(1, 3));
   nodes1.add(new NodeGene(3, 4));
-  nodes1.add(new NodeGene(2, 5));
-
-  connections1.add(new ConnectionGene(1, 4, 0.5f, true, 1));
-  connections1.add(new ConnectionGene(2, 4, -0.5f, false, 2));
-  connections1.add(new ConnectionGene(3, 4, 0.5f, true, 3));
-  connections1.add(new ConnectionGene(2, 5, -0.5f, true, 4));
-  connections1.add(new ConnectionGene(5, 4, 0.5f, true, 5));
-  connections1.add(new ConnectionGene(1, 5, 0.5f, true, 8));
   
-  Genome gen1 = new Genome(connections1, nodes1);
-
-  nodes2.add(new NodeGene(1, 1));
-  nodes2.add(new NodeGene(1, 2));
-  nodes2.add(new NodeGene(1, 3));
-  nodes2.add(new NodeGene(3, 4));
-  nodes2.add(new NodeGene(2, 5));
-  nodes2.add(new NodeGene(2, 6));
+  connections1.add(new ConnectionGene(3, 4, 0.5f, true, InnovationGenerator.getInnovation()));
   
-  connections2.add(new ConnectionGene(1, 4, 0.5f, true, 1));
-  connections2.add(new ConnectionGene(2, 4, -0.5f, false, 2));
-  connections2.add(new ConnectionGene(3, 4, 0.5f, true, 3));
-  connections2.add(new ConnectionGene(2, 5, -0.5f, true, 4));
-  connections2.add(new ConnectionGene(5, 4, 0.5f, false, 5));
-  connections2.add(new ConnectionGene(5, 6, 0.5f, true, 6));
-  connections2.add(new ConnectionGene(6, 4, 0.5f, true, 7));
-  connections2.add(new ConnectionGene(3, 5, 0.5f, true, 9));
-  connections2.add(new ConnectionGene(1, 6, 0.5f, true, 10));
+  pop = new Population(100, new Genome(connections1, nodes1), 3, 4);
   
-  Genome gen2 = new Genome(connections2, nodes2);
-  gen2.fitness = 2f;
+  println(pop.species.size() + " species");
+  for(Specie s : pop.species){
+    println(s.members.size() + " members");
+  }
   
-  pop = new Population();
-  
-  gen = pop.crossover(gen1, gen2);
+  //gen = pop.crossover(gen1, gen2);
   
   size(1000, 600);
   f = createFont("Arial", 14, true);
@@ -56,6 +68,7 @@ void setup(){
 
 void draw(){
   background(255);
+  gen = pop.gens.get(index);
   Map<Integer, Integer> inputs = new HashMap();
   Map<Integer, Integer> hiddens = new HashMap();
   Map<Integer, Integer> outputs = new HashMap();
@@ -131,13 +144,13 @@ void draw(){
       rect(xOut-20, yOut-5, 10, 10);
     }
   }
-  //delay(1000);
-  //if(index<99)
-  //  index++;
-  //else{
-  //  for(ConnectionGene con : Mutations.getInnovations()){
-  //    println(con.innovation + " - " + con.inNode + " " + con.outNode);
-  //  }
-  //  stop();
-  //}
+  delay(1000);
+  if(index<99)
+    index++;
+  else{
+    for(ConnectionGene con : Mutations.getInnovations()){
+      println(con.innovation + " - " + con.inNode + " " + con.outNode);
+    }
+    stop();
+  }
 }

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Map;
 
 class Genome{
   ArrayList<ConnectionGene> connections = new ArrayList();
@@ -25,5 +26,83 @@ class Genome{
     //Genome newGen = new Genome(connections, nodes); //testar multiplas mutações no mesmo genoma
     newGen.fitness = fitness;
     return newGen;
+  }
+  
+  float calculateExcess(Genome gen){
+    int max1 = 0;
+    int max2 = 0;
+    
+    for(ConnectionGene cg : connections){
+      if(cg.innovation > max1){
+        max1 = cg.innovation;
+      }
+    }
+    for(ConnectionGene cg : gen.connections){
+      if(cg.innovation > max2){
+        max2 = cg.innovation;
+      }
+    }
+    
+    if(max1 > max2){
+      return max1 - max2;
+    } else {
+      return max2 - max1;
+    }
+  }
+  
+  float calculateDisjoints(Genome gen){
+    int max1 = 0;
+    int max2 = 0;
+    
+    for(ConnectionGene cg : connections){
+      if(cg.innovation > max1){
+        max1 = cg.innovation;
+      }
+    }
+    for(ConnectionGene cg : gen.connections){
+      if(cg.innovation > max2){
+        max2 = cg.innovation;
+      }
+    }
+    
+    Map<Integer, ConnectionGene> map1 = new HashMap();
+    Map<Integer, ConnectionGene> map2 = new HashMap();
+    
+    for(ConnectionGene cg : connections){
+      map1.put(cg.innovation, cg);
+    }
+    for(ConnectionGene cg : gen.connections){
+      map2.put(cg.innovation, cg);
+    }
+    
+    float disjoints = 0;
+    for (Map.Entry<Integer, ConnectionGene> m : map1.entrySet()) {
+      if(map2.get(m.getKey()) == null && max2 > m.getKey()){
+        disjoints++;
+      }
+    }
+    for (Map.Entry<Integer, ConnectionGene> m : map2.entrySet()) {
+      if(map1.get(m.getKey()) == null && max1 > m.getKey()){
+        disjoints++;
+      }
+    }
+    
+    return disjoints;
+  }
+  
+  float calculateWeightDifference(Genome gen){
+    float weightSum = 0;
+    float weightCount = 0;
+    for(ConnectionGene cg1 : connections){
+      for(ConnectionGene cg2 : gen.connections){
+        if(cg1.innovation == cg2.innovation){
+          weightSum += abs(cg1.weight - cg2.weight);
+          weightCount++;
+          break;
+        }
+      }
+    }
+    
+    return weightSum / weightCount;
   }
 }

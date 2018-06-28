@@ -3,7 +3,7 @@ import java.util.Map;
 class Population{
   ArrayList<Genome> gens;
   ArrayList<Genome> newGens = new ArrayList();
-  ArrayList<Specie> species;
+  ArrayList<Specie> species = new ArrayList();
   Map<Genome, Specie> speciesMap = new HashMap();
   int size;
   int generation = 0;
@@ -29,9 +29,46 @@ class Population{
   Population(){
   }
   
-  //void sortSpecies(){
+  void sortSpecies(){
+    speciesMap = new HashMap();
+    for(Specie s : species){
+      s.reset();
+    }
     
-  //}
+    float c1 = 1;
+    float c2 = 1;
+    float c3 = 0.5;
+    float dt = 3;
+    
+    for(Genome g : gens){
+      boolean found = false;
+      float n = 1;
+      for(Specie s : species){
+        if(s.mascot.nodes.size() >= 20 || g.nodes.size() >= 20){
+          if(s.mascot.nodes.size() > g.nodes.size())
+            n = s.mascot.nodes.size();
+          else
+            n = g.nodes.size();
+        }
+        float excessCount = g.calculateExcess(s.mascot);
+        float disjointCount = g.calculateDisjoints(s.mascot);
+        float weightDifference = g.calculateWeightDifference(s.mascot);
+        float value = (c1*excessCount)/n + (c2*disjointCount)/n + c3*weightDifference;
+        if(value <= dt){
+          found = true;
+          s.members.add(g);
+          speciesMap.put(g, s);
+        }
+      }
+      if(!found){
+        ArrayList<Genome> list = new ArrayList();
+        list.add(g);
+        Specie newSpecie = new Specie(g, list);
+        species.add(newSpecie);
+        speciesMap.put(g, newSpecie);
+      }
+    }
+  }
   
   void naturalSelection(){
     //create first population on pop constructor
@@ -78,7 +115,7 @@ class Population{
     newGens = new ArrayList();
     
     //sort new generation species
-    //sortSpecies();
+    sortSpecies();
     generation++;
   }
   
@@ -252,7 +289,6 @@ class Population{
     
     if(r2<=addNodeRate){
       ConnectionGene connection = child.connections.get(floor(random(0, child.connections.size()-0.1)));
-      println(connection.innovation);
       
       NodeGene newNode = new NodeGene(2, child.nodes.size()+1);
       child.nodes.add(newNode);
@@ -301,14 +337,14 @@ class Population{
       gens.add(child);
     }
     
-    //sortSpecies();
+    sortSpecies();
     generation++;
   }
 }
 
 class Specie{
   Genome mascot;
-  ArrayList<Genome> members;
+  ArrayList<Genome> members = new ArrayList();
   float totalFitness = 0;
   
   Specie(Genome mascot, ArrayList<Genome> members){
@@ -321,7 +357,7 @@ class Specie{
   }
   
   void reset(){
-    mascot = members.get(floor(random(members.size())));
+    mascot = members.get(floor(random(members.size()))).cpy();
     members = new ArrayList();
     totalFitness = 0;
   }
