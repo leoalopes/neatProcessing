@@ -75,14 +75,17 @@ class Genome{
       map2.put(cg.innovation, cg);
     }
     
-    float disjoints = 0;
-    for (Map.Entry<Integer, ConnectionGene> m : map1.entrySet()) {
-      if(map2.get(m.getKey()) == null && max2 > m.getKey()){
-        disjoints++;
-      }
+    float disjoints = 0;    
+    float max=0;
+    if(max1 > max2){
+      max = max1;
+    } else {
+      max = max2;
     }
-    for (Map.Entry<Integer, ConnectionGene> m : map2.entrySet()) {
-      if(map1.get(m.getKey()) == null && max1 > m.getKey()){
+    for(int i=1; i<max; i++){
+      if(map1.get(i) != null && map2.get(i) == null && max2 > i){
+        disjoints++;
+      } else if(map1.get(i) == null && map2.get(i) != null && max1 > i){
         disjoints++;
       }
     }
