@@ -31,9 +31,13 @@ class Population{
   
   void sortSpecies(){
     speciesMap = new HashMap();
+    ArrayList<Specie> removedSpecies = new ArrayList();
     for(Specie s : species){
-      s.reset();
+      boolean exists = s.reset();
+      if(!exists)
+        removedSpecies.add(s);
     }
+    species.removeAll(removedSpecies);
     
     float c1 = 1;
     float c2 = 1;
@@ -95,20 +99,24 @@ class Population{
     
     while(newGens.size() < size){
       //select specie
-      //Specie s = selectSpecie();
+      Genome child;
+      Specie s = selectSpecie();
       
       //select parents
-      //Genome parent1 = selectParent(s);
-      //Genome parent2 = selectParent(s);
+      Genome parent1 = selectParent(s);
+      Genome parent2 = selectParent(s);
+      
+      printArray(parent1.connections);
+      printArray(parent2.connections);
       
       //create new
-      //Genome child = crossover(parent1, parent2);
-      
+      child = crossover(parent1, parent2);
+    
       //mutate ps: on mutation check if innovation number has to be incremented
-      //mutate(child);
+      mutate(child);
       
       //add to next gen
-      //newGens.add(child);
+      newGens.add(child);
     }
     
     gens = newGens;
@@ -119,13 +127,49 @@ class Population{
     generation++;
   }
   
-  //Specie selectSpecie(){
+  Specie selectSpecie(){
+    float fitnessSum = 0f;
+    for(Specie s : species){
+      fitnessSum += s.totalFitness;
+    }
     
-  //}
+    if(fitnessSum > 0){
+      float select = random(0, fitnessSum);
+      float sum = 0;
+      for(Specie s : species){
+        sum += s.totalFitness;
+        if(select <= sum){
+          return s;
+        }
+      }
+    }
+    
+    throw new Error("Nenhuma espécie encontrada");
+  }
   
-  //Genome selectParent(Specie s){
-  
-  //}
+  Genome selectParent(Specie s){
+    float fitnessSum = 0f;
+    for(Genome gen : s.members){
+      fitnessSum += gen.fitness;
+    }
+    
+    if(fitnessSum > 0){
+      float select = random(0, fitnessSum);
+      float sum = 0;
+      for(Genome gen : s.members){
+        sum += gen.fitness;
+        if(select <= sum){
+          if(gen.connections.size() == 0){
+            //criar debug method na class Genome
+            //descobrir por que nao ha conexoes
+          }
+          return gen;
+        }
+      }
+    }
+    
+    throw new Error("Nenhum indivíduo encontrado na espécie");
+  }
   
   Genome crossover(Genome p1, Genome p2){
     ArrayList<ConnectionGene> newConnections = new ArrayList();
@@ -234,7 +278,10 @@ class Population{
     }
     
     if(r<=mutateWeightRate){
+      println("antes do erro");
+      printArray(child.connections);
       ConnectionGene connection = child.connections.get(int(random((float)child.connections.size()-1)));
+      println("dps do erro");
       
       float r3 = random(0, 1);
       if(r3 <= 0.8){
@@ -288,7 +335,7 @@ class Population{
     }
     
     if(r2<=addNodeRate){
-      ConnectionGene connection = child.connections.get(floor(random(0, child.connections.size()-0.1)));
+      ConnectionGene connection = child.connections.get(int(random((float)child.connections.size()-1)));
       
       NodeGene newNode = new NodeGene(2, child.nodes.size()+1);
       child.nodes.add(newNode);
@@ -325,7 +372,6 @@ class Population{
       child.connections.add(newCon2);
       connection.expressed = false;
     }
-    
   }
   
   void createFirstPopulation(Genome gen){
@@ -340,53 +386,4 @@ class Population{
     sortSpecies();
     generation++;
   }
-}
-
-class Specie{
-  Genome mascot;
-  ArrayList<Genome> members = new ArrayList();
-  float totalFitness = 0;
-  
-  Specie(Genome mascot, ArrayList<Genome> members){
-    this.mascot = mascot;
-    this.members = members;
-  }
-  
-  void addFitness(float fitness){
-    totalFitness += fitness;
-  }
-  
-  void reset(){
-    mascot = members.get(floor(random(members.size()))).cpy();
-    members = new ArrayList();
-    totalFitness = 0;
-  }
-}
-
-static class Fitness{
-  
-  static float calculate(Genome gen){
-    float weightSum=0;
-
-    for(ConnectionGene con : gen.connections){
-      weightSum += abs(con.weight);
-    }
-      
-    float difference = abs(weightSum - 100);
-    
-    return 1000f/difference;
-  }
-  
-}
-
-static class Mutations{
-  static ArrayList<ConnectionGene> innovations = new ArrayList();
-  
-  static ArrayList<ConnectionGene> getInnovations(){
-    return innovations;
-  }
-  
-  static void addInnovations(ConnectionGene newInnovation){
-    innovations.add(newInnovation);
-  } 
 }
