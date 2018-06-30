@@ -3,9 +3,10 @@ class Specie{
   ArrayList<Genome> members = new ArrayList();
   float totalFitness = 0;
   
-  Specie(Genome mascot, ArrayList<Genome> members){
+  Specie(Genome mascot){
     this.mascot = mascot;
-    this.members = members;
+    this.members = new ArrayList();
+    members.add(mascot);
   }
   
   void addFitness(float fitness){
@@ -13,13 +14,10 @@ class Specie{
   }
   
   boolean reset(){
-    if(members.size() > 0){
-      mascot = members.get(floor(random(members.size()))).cpy();
-      members = new ArrayList();
-      totalFitness = 0;
-      return true;
-    }
-    return false;
+    mascot = members.get(int(random(members.size()-1)));
+    members = new ArrayList();
+    totalFitness = 0;
+    return true;
   }
 }
 

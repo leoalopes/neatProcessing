@@ -149,6 +149,9 @@ void draw(){
     soma += abs(con.weight);
   }
   println("Geração " + pop.generation + "  -  Melhor fitness: " + gen.fitness + "   Soma: " + soma);
+  //for(Specie s : pop.species){
+  //  println(s.members.size());
+  //}
   delay(1000);
   pop.naturalSelection();
 }

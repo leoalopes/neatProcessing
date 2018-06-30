@@ -31,18 +31,14 @@ class Population{
   
   void sortSpecies(){
     speciesMap = new HashMap();
-    ArrayList<Specie> removedSpecies = new ArrayList();
     for(Specie s : species){
-      boolean exists = s.reset();
-      if(!exists)
-        removedSpecies.add(s);
+      s.reset();
     }
-    species.removeAll(removedSpecies);
     
     float c1 = 1;
     float c2 = 1;
     float c3 = 0.5;
-    float dt = 3;
+    float dt = 5;
     
     for(Genome g : gens){
       boolean found = false;
@@ -62,16 +58,24 @@ class Population{
           found = true;
           s.members.add(g);
           speciesMap.put(g, s);
+          break;
         }
       }
       if(!found){
-        ArrayList<Genome> list = new ArrayList();
-        list.add(g);
-        Specie newSpecie = new Specie(g, list);
+        Specie newSpecie = new Specie(g);
         species.add(newSpecie);
         speciesMap.put(g, newSpecie);
       }
     }
+    
+    ArrayList<Specie> removedSpecies = new ArrayList();
+    for(Specie s : species){
+      if(s.members.size() == 0){
+        removedSpecies.add(s);
+      }
+    }
+    if(removedSpecies.size() > 0)
+      println(species.removeAll(removedSpecies));
   }
   
   void naturalSelection(){
@@ -105,9 +109,6 @@ class Population{
       //select parents
       Genome parent1 = selectParent(s);
       Genome parent2 = selectParent(s);
-      
-      printArray(parent1.connections);
-      printArray(parent2.connections);
       
       //create new
       child = crossover(parent1, parent2);
@@ -159,10 +160,6 @@ class Population{
       for(Genome gen : s.members){
         sum += gen.fitness;
         if(select <= sum){
-          if(gen.connections.size() == 0){
-            //criar debug method na class Genome
-            //descobrir por que nao ha conexoes
-          }
           return gen;
         }
       }
@@ -269,29 +266,23 @@ class Population{
     float mutateWeightRate = 0.5;
     float addConnectionRate = 0.1;
     float addNodeRate = 0.1;
-    float r = random(0, 1);
-    float r2 = random(0, 1);
     if(generation==0){
       mutateWeightRate = 0;
       addConnectionRate = 0.5;
       addNodeRate = 0.25;
     }
     
-    if(r<=mutateWeightRate){
-      println("antes do erro");
-      printArray(child.connections);
+    if(random(0, 1) <= mutateWeightRate){
       ConnectionGene connection = child.connections.get(int(random((float)child.connections.size()-1)));
-      println("dps do erro");
       
-      float r3 = random(0, 1);
-      if(r3 <= 0.8){
+      if(random(0, 1) <= 0.9){
         connection.weight = connection.weight*random(-2, 2);
       } else {
         connection.weight = random(-2, 2);
       }
     }
     
-    if(r<=addConnectionRate){
+    if(random(0,1) <= addConnectionRate){
       boolean mutated = false;
       int maximumTries = 10;
       do{
@@ -334,7 +325,7 @@ class Population{
       } while(!mutated && maximumTries > 0);
     }
     
-    if(r2<=addNodeRate){
+    if(random(0, 1) <= addNodeRate){
       ConnectionGene connection = child.connections.get(int(random((float)child.connections.size()-1)));
       
       NodeGene newNode = new NodeGene(2, child.nodes.size()+1);
@@ -375,6 +366,8 @@ class Population{
   }
   
   void createFirstPopulation(Genome gen){
+    gens.add(gen);
+    
     while(gens.size() < size){
       Genome child = gen.cpy();
       
