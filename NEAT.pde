@@ -148,7 +148,7 @@ void draw(){
   for(ConnectionGene con : gen.connections){
     soma += abs(con.weight);
   }
-  println("Geração " + pop.generation + "  -  Melhor fitness: " + gen.fitness + "   Soma: " + soma);
+  println("Geração " + pop.generation + " : " + pop.species.size() + " espécies -  Melhor fitness: " + gen.fitness + "   Soma: " + soma);
   //for(Specie s : pop.species){
   //  println(s.members.size());
   //}

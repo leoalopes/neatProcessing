@@ -1,11 +1,15 @@
 class NodeGene{  
   int type;
   int id;
+  int layer = 0;
   float value = 0;
   
-  public NodeGene(int type, int id) {
+  NodeGene(int type, int id) {
     this.type = type;
     this.id = id;
+  }
+  
+  NodeGene() {
   }
   
   NodeGene cpy(){
